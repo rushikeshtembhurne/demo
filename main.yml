@@ -1,0 +1,15 @@
+name: hello-world
+on: push
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to EC2
+        env:
+          ec2_key: ${{ secrets.ec2_key }}
+          ec2_ip: ${{ secrets.ec2_ip }}
+          ec2.username: ${{ secrets.ec2.username }}
+        run: |
+          # Restart Nginx
+          sudo systemctl restart nginx
