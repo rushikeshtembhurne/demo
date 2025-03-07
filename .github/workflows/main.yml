@@ -1,15 +1,31 @@
 name: hello-world
-on: push
+on:
+ push:
+   branches : [main]
 jobs:
   my-job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Deploy to EC2
+      
         env:
           ec2_key: ${{ secrets.ec2_key }}
           ec2_ip: ${{ secrets.ec2_ip }}
-          ec2.username: ${{ secrets.ec2.username }}
+          ec2_username: ${{ secrets.ec2.username }}
+          run: |
+            echo "$ec2_key" > private_key && chmod 600 private_key
+            ssh -o StrictHostKeyChecking=no -i private_key ${ec2.username}@${ec2_ip} '
+
+              # Now we have got the access of EC2 and we will start the deploy .
+              cd /home/ubuntu/ &&
+              mkdir project &&
+              cd project
+              git checkout main &&
+              git fetch --all &&
+              git reset --hard origin/main &&
+              git pull origin main &&
+              sudo cp -r * /var/www/html
         run: |
           # Restart Nginx
           sudo systemctl restart nginx
